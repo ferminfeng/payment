@@ -26,7 +26,7 @@
     },
     "autoload": {
         "psr-4": {
-			"fyflzjz\\payment\\": "/fyflzjz/payment/src"
+			"fyflzjz\\payment\\": "/src"
 		}
     },
     "extra": {
