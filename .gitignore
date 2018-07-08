@@ -1,0 +1,6 @@
+.idea
+.composer.lock
+/src/Wxpay/cert/app/*.p12
+/src/Wxpay/cert/app/*.pem
+/src/Wxpay/cert/h5/*.p12
+/src/Wxpay/cert/h5/*.pem

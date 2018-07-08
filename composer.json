@@ -1,0 +1,21 @@
+{
+    "name": "fyflzjz/payment",
+    "type": "library",
+    "description": "基于ThinkPHP的Alipay和WeChat的支付、退款、支付查询SDK",
+    "keywords": ["alipay", "weixin",  "WeChat", "支付宝支付", "微信支付", "支付接口", "payment", "refund"],
+    "homepage": "https://github.com/fyflzjz/payment",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "fyflzjz",
+            "email": "ferminfeng@gmail.com",
+            "homepage": "fyflzjz.github.io"
+        }
+    ],
+    "require": {
+        "php": ">=5.6",
+    },
+    "autoload": {
+        "psr-4": {"fyflzjz\\payment\\": "/fyflzjz/payment/src"}
+    }
+}
