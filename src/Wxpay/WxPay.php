@@ -38,7 +38,6 @@ class WxPay
         define('CURL_PROXY_HOST', $this->config['curl_proxy_host']);
         define('CURL_PROXY_PORT', $this->config['curl_proxy_port']);
         define('REPORT_LEVENL', $this->config['report_levenl']);
-        define('NOTIFY_URL', $this->config['notify_url']);
 
         //初始化日志
         $log_path = RUNTIME_PATH . 'log' . DS . date('Ym', time()) . DS . 'app_' . date('Y-m-d') . '.log';
@@ -51,7 +50,7 @@ class WxPay
     }
 
     //统一下单
-    public function get_prepay_id($body, $out_sn, $total_fee, $attach = '', $is_recharge = FALSE)
+    public function get_prepay_id($body, $out_sn, $total_fee, $attach = '', $is_recharge = FALSE, $notify_url = '')
     {
 
         //构造要请求的参数
@@ -68,7 +67,7 @@ class WxPay
         //$input->SetGoods_tag("test");
         //$input->SetProduct_id("123456789");
 
-        $input->SetNotify_url($this->config['notify_url']);//异步通知url
+        $input->SetNotify_url($notify_url);//异步通知url
 
         $input->SetTrade_type("APP");
 
@@ -80,7 +79,7 @@ class WxPay
         $result = $wxPayApi->unifiedOrder($input);
 
         if ($result['result_code'] != 'SUCCESS' || $result['return_code'] != 'SUCCESS') {
-            LogNew::INFO(json_encode($result, JSON_UNESCAPED_UNICODE ));
+            LogNew::INFO(json_encode($result, JSON_UNESCAPED_UNICODE));
         }
 
         return $result;
@@ -105,16 +104,20 @@ class WxPay
     }
 
     //查询订单
-    public function orderquery($outsn)
+    public function orderQuery($out_sn, $trade_no)
     {
         //构造要请求的参数
         $input = new WxPayOrderQuery();
 
         //通过商户订单号查询
-        $input->SetOut_trade_no($outsn);
+        if ($out_sn != '') {
+            $input->SetOut_trade_no($out_sn);
+        }
 
         //通过支付流水号查询
-        //$input->SetTransaction_id($outsn);
+        if ($out_sn == '' && $trade_no != '') {
+            $input->SetTransaction_id($trade_no);
+        }
 
         $result = WxPayApi::orderQuery($input);
 
@@ -138,18 +141,26 @@ class WxPay
     }
 
     //退款查询
-    public function refundquery($refund_id)
+    public function refundQuery($refund_no, $batch_no, $trade_no, $out_sn)
     {
         //构造要请求的参数
         $input = new WxPayRefundQuery();
-        $input->SetRefund_id($refund_id);
-        $result = WxPayApi::refundQuery($input);
 
-        /*
-        $input = new WxPayRefundQuery();
-		$input->SetTransaction_id($refund_id);
-		$result = WxPayApi::refundQuery($input);
-        */
+        if (!empty($refund_no)) {
+            //通过微信退款单号查询
+            $input->SetRefund_id($refund_no);
+        } elseif (!empty($batch_no)) {
+            //通过商户退款单号查询
+            $input->SetOut_refund_no($batch_no);
+        } elseif (!empty($trade_no)) {
+            //通过微信订单号查询
+            $input->SetTransaction_id($trade_no);
+        } elseif (!empty($out_sn)) {
+            //通过商户订单号查询
+            $input->SetOut_trade_no($out_sn);
+        }
+
+        $result = WxPayApi::refundQuery($input);
 
         return $result;
     }
@@ -158,7 +169,6 @@ class WxPay
     public function check_notify()
     {
         //构造要请求的参数
-        //$input = new WxPayRefund();
         $msg = '';
         $result = WxPayApi::notify($msg);
 

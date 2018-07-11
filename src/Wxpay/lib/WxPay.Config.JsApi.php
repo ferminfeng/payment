@@ -65,9 +65,6 @@ class WxPayConfig
              * @var int
              */
             'report_levenl' => 1,
-
-            //异步通知
-            'notify_url' => config('pay_notify_url') . config('wxPay_h5_notify_path'),
         ];
     }
 }

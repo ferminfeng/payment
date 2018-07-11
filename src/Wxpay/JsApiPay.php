@@ -48,7 +48,6 @@ class JsApiPay
             define('CURL_PROXY_HOST', $this->config['curl_proxy_host']);
             define('CURL_PROXY_PORT', $this->config['curl_proxy_port']);
             define('REPORT_LEVENL', $this->config['report_levenl']);
-            define('NOTIFY_URL', $this->config['notify_url']);
 
         //初始化日志
         $log_path = RUNTIME_PATH . 'log' .DS . date('Ym', time()) . DS . 'jsapi_' . date('Y-m-d') . '.log';
@@ -111,7 +110,7 @@ class JsApiPay
      * @param $order_type
      * @param bool $is_recharge
      */
-    public function get_prepay_id($body, $out_sn, $total_fee, $openId, $attach = '', $is_recharge = FALSE)
+    public function get_prepay_id($body, $out_sn, $total_fee, $openId, $attach = '', $is_recharge = FALSE, $notify_url = '')
     {
         //②、统一下单
         $input = new WxPayUnifiedOrder();
@@ -131,7 +130,7 @@ class JsApiPay
             $input->SetLimit_Pay("no_credit");
         }
 
-        $input->SetNotify_url(NOTIFY_URL);//异步通知url
+        $input->SetNotify_url($notify_url);//异步通知url
 
         $input->SetTrade_type("JSAPI");
         $input->SetOpenid($openId);
@@ -151,7 +150,7 @@ class JsApiPay
      *
      * @return json数据，可直接填入js函数作为参数
      */
-    public function GetJsApiParameters($prepay_id)
+    public function getJsApiParameters($prepay_id)
     {
         $jsapi = new WxPayJsApiPay();
         $jsapi->SetAppid(APPID);
@@ -172,7 +171,7 @@ class JsApiPay
      *
      * @return openid
      */
-    public function GetOpenidFromMp($code)
+    public function getOpenidFromMp($code)
     {
         $url = $this->__CreateOauthUrlForOpenid($code);
         //初始化curl
@@ -226,7 +225,7 @@ class JsApiPay
      *
      * @return 获取共享收货地址js函数需要的参数，json格式可以直接做参数使用
      */
-    public function GetEditAddressParameters()
+    public function getEditAddressParameters()
     {
         $getData = $this->data;
         $data = array();
@@ -288,18 +287,23 @@ class JsApiPay
     }
 
     //查询订单
-    public function orderquery($outsn)
+    public function orderQuery($out_sn, $trade_no)
     {
         //构造要请求的参数
         $input = new WxPayOrderQuery();
 
         //通过商户订单号查询
-        $input->SetOut_trade_no($outsn);
+        if($out_sn != ''){
+            $input->SetOut_trade_no($out_sn);
+        }
 
         //通过支付流水号查询
-        //$input->SetTransaction_id($outsn);
+        if($out_sn == '' && $trade_no != '') {
+            $input->SetTransaction_id($trade_no);
+        }
 
         $result = WxPayApi::orderQuery($input);
+
         return $result;
     }
 
@@ -319,17 +323,26 @@ class JsApiPay
     }
 
     //退款查询
-    public function refundquery($refund_id)
+    public function refundQuery($refund_no, $batch_no, $trade_no, $out_sn)
     {
         //构造要请求的参数
         $input = new WxPayRefundQuery();
-        $input->SetRefund_id($refund_id);
+
+        if(!empty($refund_no)){
+            //通过微信退款单号查询
+            $input->SetRefund_id($refund_no);
+        }elseif (!empty($batch_no)){
+            //通过商户退款单号查询
+            $input->SetOut_refund_no($batch_no);
+        }elseif (!empty($trade_no)){
+            //通过微信订单号查询
+            $input->SetTransaction_id($trade_no);
+        }elseif (!empty($out_sn)){
+            //通过商户订单号查询
+            $input->SetOut_trade_no($out_sn);
+        }
+
         $result = WxPayApi::refundQuery($input);
-        /*
-        $input = new WxPayRefundQuery();
-		$input->SetTransaction_id($refund_id);
-		$result = WxPayApi::refundQuery($input);
-        */
         return $result;
     }
 
