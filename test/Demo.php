@@ -15,6 +15,11 @@ class Payment
     /*
       唤起支付
 
+        官方文档地址
+            https://docs.open.alipay.com/api_1/alipay.trade.app.pay
+            https://docs.open.alipay.com/api_1/alipay.trade.wap.pay
+            https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_1
+
         参数说明：
             payment_name:   支付名称
             payment_amount: 支付金额，单位元

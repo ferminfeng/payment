@@ -30,7 +30,7 @@ class PaymentModel extends Model
     {
 
         if (!is_array($data)) {
-            return ['code' => '-2', 'msg' => '参数错误'];
+            return ['code' => '-2', 'msg' => '参数错误', 'data' => ''];
         }
 
         $payment_name = $data['payment_name'];
@@ -71,10 +71,10 @@ class PaymentModel extends Model
                 $request->setBizContent($setBizContent);
 
                 //同步通知地址
-                $request->setReturnUrl(config('pay_notify_url') . config('aliPay_h5_return_path'));
+                $request->setReturnUrl('同步通知地址，带http/https');
 
                 //异步通知地址
-                $request->setNotifyUrl(config('pay_notify_url') . config('aliPay_notify_path'));
+                $request->setNotifyUrl('异步通知地址，带http/https');
 
                 $response = $aop->pageExecute($request);
 
@@ -98,59 +98,11 @@ class PaymentModel extends Model
                 );
                 $request->setBizContent($setBizContent);
 
-                $request->setNotifyUrl(config('pay_notify_url') . config('aliPay_notify_path'));
+                $request->setNotifyUrl('异步通知地址，带http/https');
 
                 //这里和普通的接口调用不同，使用的是sdkExecute
                 $response = $aop->sdkExecute($request);
 
-                break;
-
-            //微信App
-            case 'wxpay_app':
-                $total_fee = $payment_amount * 100;//支付金额
-
-                $attach = urlencode(http_build_query($notify_data));//附加数据，在查询API和支付通知中原样返回
-
-                $weiXinPay = new \fyflzjz\payment\Wxpay\WxPay();
-
-                $prepay_data = $weiXinPay->get_prepay_id($payment_name, $out_sn, $total_fee, $attach, FALSE);
-
-                if ($prepay_data['result_code'] == 'SUCCESS' && $prepay_data['return_code'] == 'SUCCESS') {
-                    //获取支付参数
-                    $response = $weiXinPay->createAppPayData($prepay_data['prepay_id']);
-                    $response['packageValue'] = 'Sign=WXPay';
-                } else {
-                    //获取prepay_id失败,记录log,请重试
-                    $prepay_data['支付方式'] = 'wxapp';
-                    handleErrorInfo('wxpay_get_prepay_id_error', 1, $prepay_data);
-                }
-
-                break;
-
-            //微信H5
-            case 'wxpay_h5':
-                $total_fee = $payment_amount * 100;//支付金额
-
-                $attach = urlencode(http_build_query($notify_data));//附加数据，在查询API和支付通知中原样返回
-
-                $weiXinPay = new \fyflzjz\payment\Wxpay\JsApiPay();
-
-                //1.获取用户openid
-                $openId = $weiXinPay->GetOpenid($data);
-                if ($openId) {
-                    //获取prepay_id
-                    $prepay_data = $weiXinPay->get_prepay_id($payment_name, $out_sn, $total_fee, $openId, $attach, FALSE);
-                    if (isset($prepay_data['appid']) && isset($prepay_data['prepay_id'])
-                        && $prepay_data['prepay_id'] != ""
-                    ) {
-                        //获取支付参数
-                        $response = $weiXinPay->getJsApiParameters($prepay_data['prepay_id']);
-                    } else {
-                        //获取prepay_id失败,记录log,请重试
-                        $prepay_data['支付方式'] = 'wxh5';
-                        handleErrorInfo('wxpay_get_prepay_id_error', 1, $prepay_data);
-                    }
-                }
                 break;
 
             //支付宝PC
@@ -173,35 +125,84 @@ class PaymentModel extends Model
                 $request->setBizContent($setBizContent);
 
                 //同步通知地址
-                $request->setReturnUrl(config('pay_notify_url') . config('aliPay_pc_return_path'));
+                $request->setReturnUrl('同步通知地址，带http/https');
 
                 //异步通知地址
-                $request->setNotifyUrl(config('pay_notify_url') . config('aliPay_notify_path'));
+                $request->setNotifyUrl('异步通知地址，带http/https');
 
                 $response = $aop->pageExecute($request);
 
                 break;
 
+            //微信App
+            case 'wxpay_app':
+                $total_fee = $payment_amount * 100;//支付金额
+
+                $attach = urlencode(http_build_query($notify_data));//附加数据，在查询API和支付通知中原样返回
+
+                $notify_url = '填写自己的支付异步通知地址，带http/https';
+
+                $weiXinPay = new \fyflzjz\payment\Wxpay\WxPay();
+
+                $prepay_data = $weiXinPay->get_prepay_id($payment_name, $out_sn, $total_fee, $attach, FALSE, $notify_url);
+
+                if ($prepay_data['result_code'] == 'SUCCESS' && $prepay_data['return_code'] == 'SUCCESS') {
+                    //获取支付参数
+                    $response = $weiXinPay->createAppPayData($prepay_data['prepay_id']);
+                    $response['packageValue'] = 'Sign=WXPay';
+                } else {
+                    //获取prepay_id失败,请重试
+                    $prepay_data['支付方式'] = 'wxpay_app';
+                }
+
+                break;
+
+            //微信H5
+            case 'wxpay_h5':
+                $total_fee = $payment_amount * 100;//支付金额
+
+                $attach = urlencode(http_build_query($notify_data));//附加数据，在查询API和支付通知中原样返回
+
+                $notify_url = '填写自己的支付异步通知地址，带http/https';
+
+                $weiXinPay = new \fyflzjz\payment\Wxpay\JsApiPay();
+
+                //1.获取用户openid
+                $openId = $weiXinPay->GetOpenid($data);
+                if ($openId) {
+                    //获取prepay_id
+                    $prepay_data = $weiXinPay->get_prepay_id($payment_name, $out_sn, $total_fee, $openId, $attach, FALSE, $notify_url);
+                    if (isset($prepay_data['appid']) && isset($prepay_data['prepay_id'])
+                        && $prepay_data['prepay_id'] != ""
+                    ) {
+                        //获取支付参数
+                        $response = $weiXinPay->getJsApiParameters($prepay_data['prepay_id']);
+                    } else {
+                        //获取prepay_id失败,请重试
+                        $prepay_data['支付方式'] = 'wxpay_h5';
+                    }
+                }
+                break;
             default :
-                return ['code' => '-2', 'msg' => '参数错误'];
+                return ['code' => '-2', 'msg' => '参数错误', 'data' => ''];
         }
 
         if ($response) {
             return ['code' => '1', 'msg' => '请求成功', 'data' => $response];
         } else {
-            return ['code' => '-2', 'msg' => '请求失败', 'data' => $response];
+            return ['code' => '-2', 'msg' => '请求失败', 'data' => $prepay_data];
         }
     }
 
     /**
      * 查询支付结果
      *
-     * @param int string $payment_way
-                            alipay_app 支付宝App
-                            alipay_h5 支付宝H5
-                            alipay_pc 支付宝PC
-                            wxpay_app 微信App
-                            wxapy_h5 微信H5
+     * @param        int             string $payment_way
+     *                               alipay_app 支付宝App
+     *                               alipay_h5 支付宝H5
+     *                               alipay_pc 支付宝PC
+     *                               wxpay_app 微信App
+     *                               wxapy_h5 微信H5
      * @param string $out_sn         商户订单号
      * @param string $trade_no       第三方交易流水号
      * @param string $payment_amount 交易金额
@@ -211,7 +212,7 @@ class PaymentModel extends Model
     public function searchPaymentResult($payment_way, $out_sn = '', $trade_no = '')
     {
         if (!in_array($payment_way, ['alipay_app', 'alipay_h5', 'alipay_pc', 'wxpay_app', 'wxapy_h5']) || ($out_sn == '' && $trade_no == '')) {
-            return ['code' => '-1', 'msg' => '交易不存在'];
+            return ['code' => '-1', 'msg' => '交易不存在', 'data' => ''];
         }
 
         //交易查询
@@ -311,7 +312,7 @@ class PaymentModel extends Model
 
             case 'wxpay_h5' : //微信H5
                 $weiXinPay = new \fyflzjz\payment\Wxpay\JsApiPay();
-                $result = $weiXinPay->orderquery($out_sn, $trade_no);
+                $result = $weiXinPay->orderQuery($out_sn, $trade_no);
                 /*
                  * return_code  状态码
                  *      SUCCESS/FAIL
@@ -353,7 +354,7 @@ class PaymentModel extends Model
                 break;
 
             default :
-                $return = ['code' => '-1', 'msg' => '交易不存在'];
+                $return = ['code' => '-1', 'msg' => '交易不存在', 'data' => ''];
                 break;
         }
 
@@ -370,7 +371,7 @@ class PaymentModel extends Model
     public function aliPaySearchRefund($param)
     {
         if (!is_array($param)) {
-            return ['code' => '-1', 'msg' => '参数错误'];
+            return ['code' => '-1', 'msg' => '参数错误', 'data' => ''];
         }
 
         $aop = new \fyflzjz\payment\AlipayAop\AopClient();
@@ -416,7 +417,7 @@ class PaymentModel extends Model
     public function aliPayRefund($param)
     {
         if (!is_array($param)) {
-            return ['code' => '-1', 'msg' => '参数错误'];
+            return ['code' => '-1', 'msg' => '参数错误', 'data' => ''];
         }
 
         $aop = new \fyflzjz\payment\AlipayAop\AopClient();
@@ -468,7 +469,7 @@ class PaymentModel extends Model
     public function wxSearchRefund($param)
     {
         if (!is_array($param)) {
-            return ['code' => '-1', 'msg' => '参数错误'];
+            return ['code' => '-1', 'msg' => '参数错误', 'data' => ''];
         }
 
         //查询微信APP退款
@@ -478,7 +479,7 @@ class PaymentModel extends Model
             //查询微信H5退款
             $weiXinPay = new \fyflzjz\payment\Wxpay\JsApiPay();
         } else {
-            return ['code' => '-1', 'msg' => '参数错误'];
+            return ['code' => '-1', 'msg' => '参数错误', 'data' => ''];
         }
 
         $result = $weiXinPay->refundQuery($param['refund_no'], $param['batch_no'], $param['trade_no'], $param['out_sn']);
@@ -499,7 +500,7 @@ class PaymentModel extends Model
     public function wxRefund($param)
     {
         if (!is_array($param)) {
-            return ['code' => '-1', 'msg' => '参数错误'];
+            return ['code' => '-1', 'msg' => '参数错误', 'data' => ''];
         }
 
         //查询微信APP退款
@@ -509,7 +510,7 @@ class PaymentModel extends Model
             //查询微信H5退款
             $weiXinPay = new \fyflzjz\payment\Wxpay\JsApiPay($param['trade_no'], $param['total_fee'] * 100, $param['refund_amount'] * 100);
         } else {
-            return ['code' => '-1', 'msg' => '参数错误'];
+            return ['code' => '-1', 'msg' => '参数错误', 'data' => ''];
         }
 
         $result = $weiXinPay->send();
@@ -529,13 +530,8 @@ class PaymentModel extends Model
      */
     public function getBillDownload($param)
     {
-//        $param = [
-//            'ali_date' => '2017-03-06',
-//            'wx_date' => '20170306',
-//            'payment_way' => '...',
-//        ];
         if (!is_array($param)) {
-            return ['code' => '-1', 'msg' => '参数错误'];
+            return ['code' => '-1', 'msg' => '参数错误', 'data' => ''];
         }
 
         if (in_array($param['payment_way'], ['alipay_app', 'alipay_h5', 'alipay_pc'])) {
@@ -565,7 +561,7 @@ class PaymentModel extends Model
         if ($result) {
             return ['code' => '1', 'msg' => '请求成功', 'data' => $result];
         } else {
-            return ['code' => '-2', 'msg' => '数据为空'];
+            return ['code' => '-2', 'msg' => '数据为空', 'data' => ''];
         }
 
     }
