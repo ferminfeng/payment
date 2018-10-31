@@ -1,5 +1,5 @@
 <?php
-namespace fyflzjz\payment\Wxpay;
+namespace fyflzjz\payment\Wxpay\lib;
 
 
 /**
