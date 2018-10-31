@@ -2,6 +2,7 @@
 
 namespace fyflzjz\payment\AlipayAop;
 
+require_once VENDOR_PATH . "fyflzjz/payment/src/AlipayAop/Config.php";
 class AopClient {
 
     //应用ID 在开发者中心
@@ -42,8 +43,10 @@ class AopClient {
     /**
      * AopClient constructor.
      */
-    public function __construct($config)
+    public function __construct()
     {
+        $config = Config::getConfig();
+
         $this->appId = $config['app_id'];
         $this->alipayrsaPublicKey = $config['rsa_public_key'];
         $this->rsaPrivateKey = $config['rsa_private_key'];

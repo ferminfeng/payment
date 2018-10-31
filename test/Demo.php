@@ -42,35 +42,6 @@ class Payment
      */
     public function payment()
     {
-		//支付宝配置
-		$config = [
-			'app_id' => '',
-			'rsa_public_key' => '',
-			'rsa_private_key' => '',
-		];
-		
-		//微信app配置
-		$config = [
-			'app_id' => '',
-			'mch_id' => '',
-			'app_key' => '',
-			'app_secret' => '',
-			//仅退款、撤销订单时需要
-			'sslcert_path' => '',
-			'sslkey_path' => '',
-		];
-		
-		//微信h5配置
-		$config = [
-			'app_id' => '',
-			'mch_id' => '',
-			'app_key' => '',
-			'app_secret' => '',
-			//仅退款、撤销订单时需要
-			'sslcert_path' => '',
-			'sslkey_path' => '',
-		];
-		
         $data = [
             'payment_name'   => '测试支付',
             'payment_amount' => '15',
@@ -79,7 +50,7 @@ class Payment
             'order_type'     => 'test',
         ];
         $model_payment = new PaymentModel();
-        $res = $model_payment->payment($config, $data);
+        $res = $model_payment->payment($data);
         var_dump($res);
     }
 
@@ -111,35 +82,6 @@ class Payment
         */
     public function searchPaymentResult()
     {
-		//支付宝配置
-		$config = [
-			'app_id' => '',
-			'rsa_public_key' => '',
-			'rsa_private_key' => '',
-		];
-		
-		//微信app配置
-		$config = [
-			'app_id' => '',
-			'mch_id' => '',
-			'app_key' => '',
-			'app_secret' => '',
-			//仅退款、撤销订单时需要
-			'sslcert_path' => '',
-			'sslkey_path' => '',
-		];
-		
-		//微信h5配置
-		$config = [
-			'app_id' => '',
-			'mch_id' => '',
-			'app_key' => '',
-			'app_secret' => '',
-			//仅退款、撤销订单时需要
-			'sslcert_path' => '',
-			'sslkey_path' => '',
-		];
-		
         $param = [
             'payment_way' => 'wxpay_app',
             'out_sn'      => '201708181743020003',
@@ -147,7 +89,7 @@ class Payment
         ];
 
         $model_payment = new PaymentModel();
-        $res = $model_payment->searchPaymentResult($config, $param);
+        $res = $model_payment->searchPaymentResult($param);
         if ($res['code'] == '1') {
             //支付成功
         } else {
@@ -178,42 +120,13 @@ class Payment
      */
     public function aliPaySearchRefund()
     {
-		//支付宝配置
-		$config = [
-			'app_id' => '',
-			'rsa_public_key' => '',
-			'rsa_private_key' => '',
-		];
-		
-		//微信app配置
-		$config = [
-			'app_id' => '',
-			'mch_id' => '',
-			'app_key' => '',
-			'app_secret' => '',
-			//仅退款、撤销订单时需要
-			'sslcert_path' => '',
-			'sslkey_path' => '',
-		];
-		
-		//微信h5配置
-		$config = [
-			'app_id' => '',
-			'mch_id' => '',
-			'app_key' => '',
-			'app_secret' => '',
-			//仅退款、撤销订单时需要
-			'sslcert_path' => '',
-			'sslkey_path' => '',
-		];
-		
         $param = [
             'out_sn'   => '201708181743020003',
             'trade_no' => '2017081817430200030700',
             'batch_no' => '20170818001',
         ];
         $model_payment = new PaymentModel();
-        $res = $model_payment->aliPaySearchRefund($config, $param);
+        $res = $model_payment->aliPaySearchRefund($param);
         if ($res['code'] == '1') {
             //退款成功
         } else {
@@ -245,35 +158,6 @@ class Payment
      */
     public function aliPayRefund()
     {
-		//支付宝配置
-		$config = [
-			'app_id' => '',
-			'rsa_public_key' => '',
-			'rsa_private_key' => '',
-		];
-		
-		//微信app配置
-		$config = [
-			'app_id' => '',
-			'mch_id' => '',
-			'app_key' => '',
-			'app_secret' => '',
-			//仅退款、撤销订单时需要
-			'sslcert_path' => '',
-			'sslkey_path' => '',
-		];
-		
-		//微信h5配置
-		$config = [
-			'app_id' => '',
-			'mch_id' => '',
-			'app_key' => '',
-			'app_secret' => '',
-			//仅退款、撤销订单时需要
-			'sslcert_path' => '',
-			'sslkey_path' => '',
-		];
-		
         $param = [
             'out_sn'        => '201708181743020003',
             'trade_no'      => '2017081817430200030700',
@@ -282,7 +166,7 @@ class Payment
             'refund_reason' => '退款备注',
         ];
         $model_payment = new PaymentModel();
-        $res = $model_payment->aliPayRefund($config, $param);
+        $res = $model_payment->aliPayRefund($param);
         if ($res['code'] == '1') {
             //退款成功
         } else {
@@ -317,35 +201,6 @@ class Payment
      */
     public function wxSearchRefund()
     {
-		//支付宝配置
-		$config = [
-			'app_id' => '',
-			'rsa_public_key' => '',
-			'rsa_private_key' => '',
-		];
-		
-		//微信app配置
-		$config = [
-			'app_id' => '',
-			'mch_id' => '',
-			'app_key' => '',
-			'app_secret' => '',
-			//仅退款、撤销订单时需要
-			'sslcert_path' => '',
-			'sslkey_path' => '',
-		];
-		
-		//微信h5配置
-		$config = [
-			'app_id' => '',
-			'mch_id' => '',
-			'app_key' => '',
-			'app_secret' => '',
-			//仅退款、撤销订单时需要
-			'sslcert_path' => '',
-			'sslkey_path' => '',
-		];
-		
         $param = [
             'refund_no'   => '2017081813245613',
             'out_sn'      => '201708181743020003',
@@ -354,7 +209,7 @@ class Payment
             'payment_way' => 'wxpay_app',
         ];
         $model_payment = new PaymentModel();
-        $res = $model_payment->wxSearchRefund($config, $param);
+        $res = $model_payment->wxSearchRefund($param);
         if ($res['code'] == '1') {
             //退款成功
         } else {
@@ -386,35 +241,6 @@ class Payment
      */
     public function wxRefund()
     {
-		//支付宝配置
-		$config = [
-			'app_id' => '',
-			'rsa_public_key' => '',
-			'rsa_private_key' => '',
-		];
-		
-		//微信app配置
-		$config = [
-			'app_id' => '',
-			'mch_id' => '',
-			'app_key' => '',
-			'app_secret' => '',
-			//仅退款、撤销订单时需要
-			'sslcert_path' => '',
-			'sslkey_path' => '',
-		];
-		
-		//微信h5配置
-		$config = [
-			'app_id' => '',
-			'mch_id' => '',
-			'app_key' => '',
-			'app_secret' => '',
-			//仅退款、撤销订单时需要
-			'sslcert_path' => '',
-			'sslkey_path' => '',
-		];
-		
         $param = [
             'total_fee'     => '5',
             'refund_amount' => '2',
@@ -422,7 +248,7 @@ class Payment
             'payment_way'   => 'wxpay_app',
         ];
         $model_payment = new PaymentModel();
-        $res = $model_payment->wxRefund(config, $param);
+        $res = $model_payment->wxRefund($param);
         if ($res['code'] == '1') {
             //退款成功
         } else {
@@ -450,42 +276,13 @@ class Payment
     public function getBillDownload()
     {
 
-		//支付宝配置
-		$config = [
-			'app_id' => '',
-			'rsa_public_key' => '',
-			'rsa_private_key' => '',
-		];
-		
-		//微信app配置
-		$config = [
-			'app_id' => '',
-			'mch_id' => '',
-			'app_key' => '',
-			'app_secret' => '',
-			//仅退款、撤销订单时需要
-			'sslcert_path' => '',
-			'sslkey_path' => '',
-		];
-		
-		//微信h5配置
-		$config = [
-			'app_id' => '',
-			'mch_id' => '',
-			'app_key' => '',
-			'app_secret' => '',
-			//仅退款、撤销订单时需要
-			'sslcert_path' => '',
-			'sslkey_path' => '',
-		];
-		
         $param = [
             'ali_date'    => '2017-03-06',
             'wx_date'     => '20170306',
             'payment_way' => '...',
         ];
         $model_payment = new PaymentModel();
-        $res = $model_payment->getBillDownload($config, $param);
+        $res = $model_payment->getBillDownload($param);
         if ($res['code'] == '1') {
             //查询成功
         } else {
@@ -515,15 +312,8 @@ class Payment
 
         parse_str(urldecode($notify_data['passback_params']), $passback_params);
 
-		//支付宝配置
-		$config = [
-			'app_id' => '',
-			'rsa_public_key' => '',
-			'rsa_private_key' => '',
-		];
-		
         //支付宝验签
-        $aop = new \fyflzjz\payment\AlipayAop\AopClient($config);
+        $aop = new \fyflzjz\payment\AlipayAop\AopClient();
         $notify_result = $aop->rsaCheckV1($notify_data);
         if ($notify_result) {
             //区分异步通知状态 当trade_status=TRADE_SUCCESS时表明支付成功
@@ -559,18 +349,7 @@ class Payment
         //验签
         $new_content = file_get_contents("php://input");
 
-		
-		//微信app配置
-		$config = [
-			'app_id' => '',
-			'mch_id' => '',
-			'app_key' => '',
-			'app_secret' => '',
-			//仅退款、撤销订单时需要
-			'sslcert_path' => '',
-			'sslkey_path' => '',
-		];
-        $weiXinPay = new \fyflzjz\payment\Wxpay\WxPay($config);
+        $weiXinPay = new \fyflzjz\payment\Wxpay\WxPay();
         $notify_info = $weiXinPay->check_notify();
 
         //验签失败 返回消息给微信服务器
@@ -622,18 +401,7 @@ class Payment
         //验签
         $new_content = file_get_contents("php://input");
 
-		
-		//微信h5配置
-		$config = [
-			'app_id' => '',
-			'mch_id' => '',
-			'app_key' => '',
-			'app_secret' => '',
-			//仅退款、撤销订单时需要
-			'sslcert_path' => '',
-			'sslkey_path' => '',
-		];
-        $weiXinPay = new \fyflzjz\payment\Wxpay\JsApiPay($config);
+        $weiXinPay = new \fyflzjz\payment\Wxpay\JsApiPay();
         $notify_info = $weiXinPay->check_notify();
 
         //验签失败 返回消息给微信服务器
@@ -684,15 +452,8 @@ class Payment
     {
         $notify_data = $_GET;
 
-		//支付宝配置
-		$config = [
-			'app_id' => '',
-			'rsa_public_key' => '',
-			'rsa_private_key' => '',
-		];
-		
         //支付宝验签
-        $aop = new \fyflzjz\payment\AlipayAop\AopClient($config);
+        $aop = new \fyflzjz\payment\AlipayAop\AopClient();
         $notify_result = $aop->rsaCheckV1($notify_data);
         if ($notify_result) {
             $out_trade_no = $notify_data['out_trade_no'];
@@ -712,15 +473,8 @@ class Payment
     {
         $notify_data = $_GET;
 
-		//支付宝配置
-		$config = [
-			'app_id' => '',
-			'rsa_public_key' => '',
-			'rsa_private_key' => '',
-		];
-		
         //支付宝验签
-        $aop = new \fyflzjz\payment\AlipayAop\AopClient($config);
+        $aop = new \fyflzjz\payment\AlipayAop\AopClient();
         $notify_result = $aop->rsaCheckV1($notify_data);
         if ($notify_result) {
             $out_trade_no = $notify_data['out_trade_no'];
