@@ -7,11 +7,25 @@ namespace fyflzjz\payment\Wxpay;
 ini_set('date.timezone', 'Asia/Shanghai');
 error_reporting(E_ERROR);
 
-require_once VENDOR_PATH . "fyflzjz/payment/src/Wxpay/lib/WxPay.Api.php";
-require_once VENDOR_PATH . "fyflzjz/payment/src/Wxpay/lib/WxPay.Exception.php";
-require_once VENDOR_PATH . "fyflzjz/payment/src/Wxpay/lib/WxPay.Config.php";
-require_once VENDOR_PATH . "fyflzjz/payment/src/Wxpay/lib/WxPay.Data.php";
-require_once VENDOR_PATH . "fyflzjz/payment/src/Wxpay/CLogFileHandler.php";
+use fyflzjz\payment\Wxpay\lib\WxPayApi;
+use fyflzjz\payment\Wxpay\lib\WxPayException;
+use fyflzjz\payment\Wxpay\lib\WxPayNotify;
+use fyflzjz\payment\Wxpay\lib\WxPayBizPayUrl;
+use fyflzjz\payment\Wxpay\lib\WxPayCloseOrder;
+use fyflzjz\payment\Wxpay\lib\WxPayDataBase;
+use fyflzjz\payment\Wxpay\lib\WxPayDownloadBill;
+use fyflzjz\payment\Wxpay\lib\WxPayJsApiPay;
+use fyflzjz\payment\Wxpay\lib\WxPayMicroPay;
+use fyflzjz\payment\Wxpay\lib\WxPayNotifyReply;
+use fyflzjz\payment\Wxpay\lib\WxPayRefund;
+use fyflzjz\payment\Wxpay\lib\WxPayRefundQuery;
+use fyflzjz\payment\Wxpay\lib\WxPayReport;
+use fyflzjz\payment\Wxpay\lib\WxPayResults;
+use fyflzjz\payment\Wxpay\lib\WxPayReverse;
+use fyflzjz\payment\Wxpay\lib\WxPayShortUrl;
+use fyflzjz\payment\Wxpay\lib\WxPayUnifiedOrder;
+use fyflzjz\payment\Wxpay\CLogFileHandler;
+use fyflzjz\payment\Wxpay\lib\WxPayConfig;
 
 class WxPay
 {
@@ -25,22 +39,14 @@ class WxPay
     private $refund_fee = '';
 
     //构造函数
-    public function __construct($transaction_id = '', $total_fee = '', $refund_fee = '')
+    public function __construct($config, $transaction_id = '', $total_fee = '', $refund_fee = '')
     {
         //初始化配置
-        $this->config = WxPayConfig::getConfig();
-        define('APPID', $this->config['app_id']);
-        define('MCHID', $this->config['mch_id']);
-        define('KEY', $this->config['app_key']);
-        define('APPSECRET', $this->config['app_secret']);
-        define('SSLCERT_PATH', $this->config['sslcert_path']);
-        define('SSLKEY_PATH', $this->config['sslkey_path']);
-        define('CURL_PROXY_HOST', $this->config['curl_proxy_host']);
-        define('CURL_PROXY_PORT', $this->config['curl_proxy_port']);
-        define('REPORT_LEVENL', $this->config['report_levenl']);
+        $wxPayConfig = new WxPayConfig();
+        $wxPayConfig->getConfig($config);
 
         //初始化日志
-        $log_path = RUNTIME_PATH . 'log' . DS . date('Ym', time()) . DS . 'app_' . date('Y-m-d') . '.log';
+        $log_path = $config['log_path'] . 'log' . DIRECTORY_SEPARATOR . date('Ym', time()) . DIRECTORY_SEPARATOR . 'app_' . date('Y-m-d') . '.log';
         $logHandler = new CLogFileHandler($log_path);
         LogNew::Init($logHandler, 15);
 
